@@ -1,0 +1,13 @@
+# Downloaded data and pipeline outputs are rebuilt by running the pipeline
+data/
+results/
+logs/
+.snakemake/
+
+# Python and R clutter
+__pycache__/
+*.pyc
+.Rhistory
+.RData
+.ipynb_checkpoints/
+.DS_Store

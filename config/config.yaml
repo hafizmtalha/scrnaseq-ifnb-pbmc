@@ -1,0 +1,26 @@
+# Public data from Kang et al. 2018 (GEO accession GSE96583, batch 2).
+# PBMCs from 8 donors, either left alone (ctrl) or treated with interferon beta (stim).
+geo: https://ftp.ncbi.nlm.nih.gov/geo
+files:
+  ctrl_matrix: samples/GSM2560nnn/GSM2560248/suppl/GSM2560248_2.1.mtx.gz
+  ctrl_barcodes: samples/GSM2560nnn/GSM2560248/suppl/GSM2560248_barcodes.tsv.gz
+  stim_matrix: samples/GSM2560nnn/GSM2560249/suppl/GSM2560249_2.2.mtx.gz
+  stim_barcodes: samples/GSM2560nnn/GSM2560249/suppl/GSM2560249_barcodes.tsv.gz
+  genes: series/GSE96nnn/GSE96583/suppl/GSE96583_batch2.genes.tsv.gz
+  metadata: series/GSE96nnn/GSE96583/suppl/GSE96583_batch2.total.tsne.df.tsv.gz
+
+# Cell filters
+min_genes: 200
+max_genes: 2500
+max_pct_mito: 5
+min_cells_per_gene: 3
+
+# Clustering
+n_top_genes: 2000
+n_pcs: 30
+leiden_resolution: 1.0
+
+# Pseudobulk: drop a donor and cell type pair if it has fewer cells than this
+min_cells_pseudobulk: 10
+
+seed: 0

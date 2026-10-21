@@ -1,0 +1,108 @@
+configfile: "config/config.yaml"
+
+DATA_FILES = list(config["files"].keys())
+
+
+rule all:
+    input:
+        "results/figures/umap_cell_types.png",
+        "results/de/de_summary.tsv",
+        "results/figures/pathway_activity.png",
+
+
+rule download:
+    output:
+        "data/raw/{name}.gz",
+    params:
+        url=lambda wc: f"{config['geo']}/{config['files'][wc.name]}",
+    wildcard_constraints:
+        name="|".join(DATA_FILES),
+    retries: 2
+    shell:
+        "curl -sL --retry 5 -o {output} {params.url} && gzip -t {output}"
+
+
+rule load:
+    input:
+        expand("data/raw/{name}.gz", name=DATA_FILES),
+    output:
+        "results/adata/01_raw.h5ad",
+    log:
+        "logs/01_load.log",
+    script:
+        "scripts/01_load.py"
+
+
+rule qc:
+    input:
+        "results/adata/01_raw.h5ad",
+    output:
+        adata="results/adata/02_qc.h5ad",
+        before="results/figures/qc_before_filtering.png",
+        after="results/figures/qc_after_filtering.png",
+        table="results/tables/qc_summary.tsv",
+    log:
+        "logs/02_qc.log",
+    script:
+        "scripts/02_qc.py"
+
+
+rule integrate:
+    input:
+        "results/adata/02_qc.h5ad",
+    output:
+        adata="results/adata/03_integrated.h5ad",
+        umap="results/figures/umap_before_after_harmony.png",
+    log:
+        "logs/03_integrate.log",
+    script:
+        "scripts/03_integrate.py"
+
+
+rule annotate:
+    input:
+        "results/adata/03_integrated.h5ad",
+    output:
+        adata="results/adata/04_annotated.h5ad",
+        umap="results/figures/umap_cell_types.png",
+        clusters="results/figures/umap_clusters.png",
+        dotplot="results/figures/marker_dotplot.png",
+        scores="results/figures/marker_scores_by_cluster.png",
+        compare="results/figures/compare_with_published_labels.png",
+        markers="results/tables/cluster_markers.tsv",
+        counts="results/tables/cell_type_counts.tsv",
+    log:
+        "logs/04_annotate.log",
+    script:
+        "scripts/04_annotate.py"
+
+
+rule pseudobulk_de:
+    input:
+        "results/adata/04_annotated.h5ad",
+    output:
+        summary="results/de/de_summary.tsv",
+        all_results="results/de/de_all_cell_types.tsv",
+        bar="results/figures/de_genes_per_cell_type.png",
+        volcano="results/figures/volcano_cd14_monocytes.png",
+        heatmap="results/figures/top_de_genes_heatmap.png",
+        pca="results/figures/pseudobulk_pca.png",
+    log:
+        "logs/05_pseudobulk_de.log",
+    threads: 4
+    script:
+        "scripts/05_pseudobulk_de.py"
+
+
+rule pathways:
+    input:
+        de="results/de/de_all_cell_types.tsv",
+        adata="results/adata/04_annotated.h5ad",
+    output:
+        table="results/de/pathway_activity.tsv",
+        heatmap="results/figures/pathway_activity.png",
+        umap="results/figures/umap_interferon_score.png",
+    log:
+        "logs/06_pathways.log",
+    script:
+        "scripts/06_pathways.py"

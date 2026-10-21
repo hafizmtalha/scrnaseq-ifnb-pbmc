@@ -1,0 +1,18 @@
+name: scrnaseq-ifnb-pbmc
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.12.15
+  - snakemake-minimal=9.27.1
+  - scanpy=1.12.4
+  - scikit-image=0.26.0
+  - anndata=0.13.4
+  - leidenalg=0.12.0
+  - python-igraph=1.0.0
+  - harmonypy=2.1.0
+  - pydeseq2=0.5.4
+  - decoupler-py=2.1.6
+  - matplotlib=3.11.2
+  - seaborn=0.13.2
+  - pandas=3.0.6
